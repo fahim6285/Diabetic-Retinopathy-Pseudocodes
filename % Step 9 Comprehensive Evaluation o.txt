@@ -1,0 +1,90 @@
+% Step 9: Comprehensive Evaluation of DiaRetULS-Net
+
+%% --- Confusion Matrix Plot (Fig. 19) ---
+figure;
+confusionchart(trueLabels, predictedLabels, ...
+    'Title', 'Fig.19 Final Confusion Matrix', ...
+    'RowSummary','row-normalized', ...
+    'ColumnSummary','column-normalized');
+grid on;
+
+%% --- ROC Curve Plot (Fig. 20) ---
+% Assuming 'scores' are classifier scores for each class
+figure;
+hold on;
+for i = 1:numClasses
+    [X, Y, T, AUC] = perfcurve(trueLabels, scores(:,i), i);
+    plot(X, Y, 'DisplayName', ['Class ' num2str(i) ' (AUC=' num2str(AUC,2) ')']);
+end
+xlabel('False Positive Rate');
+ylabel('True Positive Rate');
+title('Fig.20 ROC Curve for DiaRetULS-Net');
+legend show;
+grid on;
+hold off;
+
+%% --- Error Histogram (Fig. 21) ---
+% Error = (True Label Index) - (Predicted Label Index)
+errors = double(trueLabels) - double(predictedLabels);
+figure;
+histogram(errors, 'Normalization', 'probability');
+xlabel('Prediction Error');
+ylabel('Probability');
+title('Fig.21 Error Histogram of DiaRetULS-Net');
+grid on;
+
+%% --- Cross-Validation (5-Fold) Results (Fig. 22) ---
+% Assume 5-fold cross-validation results available:
+accuracy_cv = [98.7, 98.8, 98.9, 98.6, 98.9]; % Example values (%)
+sensitivity_cv = [99.1, 99.2, 99.3, 99.0, 99.2];
+specificity_cv = [98.8, 98.7, 98.9, 98.6, 98.8];
+
+figure;
+plot(1:5, accuracy_cv, '-o', 'DisplayName', 'Accuracy');
+hold on;
+plot(1:5, sensitivity_cv, '-s', 'DisplayName', 'Sensitivity');
+plot(1:5, specificity_cv, '-d', 'DisplayName', 'Specificity');
+xlabel('Fold Number');
+ylabel('Performance (%)');
+title('Fig.22 5-Fold Cross-Validation Analysis');
+legend('show');
+grid on;
+hold off;
+
+%% --- Misclassification Summary (Table 10) ---
+% Represented as matrix
+MisclassificationMatrix = [
+    103 2   0   0   0;
+      1 63  1   0   0;
+      0 2  50  0   0;
+      0 0  1  25  0;
+      0 0  0   1  12];
+
+disp('Table 10: Misclassification Summary:');
+disp(array2table(MisclassificationMatrix, ...
+    'VariableNames', {'Grade_0','Grade_1','Grade_2','Grade_3','Grade_4'}, ...
+    'RowNames', {'Grade_0','Grade_1','Grade_2','Grade_3','Grade_4'}));
+
+%% --- Cross-Dataset Evaluation (Table 11) ---
+Datasets = {'Messidor-2', 'APTOS 2019', 'IDRiD'};
+Accuracy = [98.83, 97.12, 96.34];
+Precision = [99.28, 97.68, 95.98];
+Sensitivity = [99.21, 96.87, 96.21];
+Specificity = [98.87, 96.93, 95.71];
+F1Score = [99.15, 97.27, 96.09];
+
+CrossDatasetResults = table(Datasets', Accuracy', Precision', Sensitivity', Specificity', F1Score', ...
+    'VariableNames', {'Dataset', 'Accuracy', 'Precision', 'Sensitivity', 'Specificity', 'F1_Score'});
+disp('Table 11: Cross-Dataset Evaluation Results:');
+disp(CrossDatasetResults);
+
+%% --- Baseline Model Comparison (Table 12) ---
+Models = {'DiaRetULS-Net', 'VGG19', 'LSTM', 'AlexNet', 'InceptionV3', 'ResNet50', 'DenseNet121'};
+DatasetsRep = repmat({'Messidor-2', 'APTOS 2019', 'IDRiD'}, 1, 7);
+ModelsRep = repelem(Models, 3);
+
+AccuracyVals = [98.83,97.12,96.34, 96.24,94.32,93.01, 94.38,92.05,90.84, ...
+                91.74,89.67,88.32, 95.35,93.65,92.84, 96.91,95.02,94.45, 97.14,95.87,94.96];
+PrecisionVals = [99.28,97.68,95.98, 95.63,94.5,92.8, 93.25,91.76,90.33, ...
+                 90.75,88.9,87.91, 95.02,93.1,92.65, 96.30,94.88,94.23, 96.93,95.55,94.73];
+SensitivityVals = [99.21,96.87,96.

@@ -1,0 +1,28 @@
+% Step 4: Feature Extraction using DWT and LBP
+
+% Input: I_CLAHE — Preprocessed enhanced grayscale image
+
+% 4.1 Apply 2D Discrete Wavelet Transform (DWT)
+
+% Perform single-level 2D DWT decomposition
+[cA, cH, cV, cD] = dwt2(I_CLAHE, 'haar');  % 'haar' wavelet is commonly used for simplicity
+
+% cA: Approximation Coefficients (Low Frequency)
+% cH: Horizontal Detail Coefficients (High Frequency Horizontal)
+% cV: Vertical Detail Coefficients (High Frequency Vertical)
+% cD: Diagonal Detail Coefficients (High Frequency Diagonal)
+
+% 4.2 Extract Local Binary Patterns (LBP) from the enhanced image
+
+% Define LBP parameters
+radius = 1;         % Radius around the central pixel
+numNeighbors = 8;   % Number of neighbors to consider
+
+% Compute the LBP image
+I_LBP = extractLBPFeatures(I_CLAHE, 'Radius', radius, 'NumNeighbors', numNeighbors, 'Upright', true);
+
+% 4.3 Combine the Features (Optional, if needed later)
+% You can choose to concatenate DWT coefficients and LBP features into a single feature vector if needed:
+% feature_vector = [cA(:); cH(:); cV(:); cD(:); I_LBP(:)];
+
+% Output: cA, cH, cV, cD (DWT features) and I_LBP (Texture features)

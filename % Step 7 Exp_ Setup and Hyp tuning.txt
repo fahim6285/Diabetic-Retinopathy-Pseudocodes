@@ -1,0 +1,86 @@
+% Step 7: Experimental Setup and Hyperparameter Initialization
+
+% ---- Software Environment Setup ----
+% Initialize MATLAB environment
+ver % Display MATLAB version
+matlabVersion = 'R2017b'; 
+
+% Load necessary toolboxes
+assert(license('test','Image_Acquisition_Toolbox'), 'Image Acquisition Toolbox not found.');
+assert(license('test','Computer_Vision_Toolbox'), 'Computer Vision Toolbox not found.');
+assert(license('test','Neural_Network_Toolbox'), 'Deep Learning Toolbox not found.');
+
+% ---- Hardware Configuration ----
+cpuDetails = 'Intel(R) Core(TM) Ultra i5-125H, 1.20 GHz';
+ramDetails = '16.0 GB RAM (15.4 GB usable)';
+systemType = '64-bit operating system, x64-based processor';
+
+% Display system details
+disp(['CPU: ', cpuDetails]);
+disp(['RAM: ', ramDetails]);
+disp(['System Type: ', systemType]);
+
+% ---- Dataset Information ----
+datasetName = 'MESSIDOR-2 Retinal Fundus Images';
+numImages = 1748;
+disp(['Dataset Used: ', datasetName]);
+
+% ---- Hyperparameter Initialization ----
+% U-Net Hyperparameters
+unet_lr = 1e-4;
+unet_batch_size = 16;
+unet_dropout_rate = 0.3;
+unet_num_filters = 64; % Initial filters
+unet_kernel_size = [3 3];
+
+% LTCN Hyperparameters
+ltcn_time_constant = 0.5;
+ltcn_learning_rate = 1e-5;
+ltcn_dropout_rate = 0.2;
+ltcn_neurons_per_layer = 100;
+
+% Multi-Class SVM Hyperparameters
+svm_kernel_type = 'RBF';
+svm_regularization_C = 1;
+svm_gamma = 0.01;
+
+% Display hyperparameter settings
+disp('Hyperparameters for DiaRetULS-Net Initialized.');
+
+% ---- Experimental Pipeline Visualization ----
+% 1. Load input image (example)
+inputImage = imread('sample_fundus_image.jpg');
+figure, imshow(inputImage); title('Fig.7 Input Image');
+
+% 2. Resize image to 512x512
+resizedImage = imresize(inputImage, [512, 512], 'bilinear');
+figure, imshow(resizedImage); title('Fig.8 Resized Image');
+
+% 3. Convert to Grayscale
+grayImage = rgb2gray(resizedImage);
+figure, imshow(grayImage); title('Fig.9 Grayscale Image');
+
+% 4. Segment Blood Vessels using Pre-trained U-Net
+segmentedVessels = uNetSegment(grayImage); % Placeholder function
+figure, imshow(segmentedVessels); title('Fig.10 Retina Blood Vessels');
+
+% 5. Localize Fovea Region 1
+foveaRegion1 = detectFoveaRegion(segmentedVessels, 'primary'); % Placeholder function
+figure, imshow(foveaRegion1); title('Fig.11 Fovea Region 1');
+
+% 6. Localize Fovea Region 2
+foveaRegion2 = detectFoveaRegion(segmentedVessels, 'secondary'); % Placeholder function
+figure, imshow(foveaRegion2); title('Fig.12 Fovea Region 2');
+
+% 7. Feature Extraction using U-Net + LTCN
+featuresExtracted = featureExtraction_DiaRetULSNet(grayImage, segmentedVessels, foveaRegion1, foveaRegion2); % Placeholder function
+
+% 8. Classification using Multi-Class SVM
+[predictedClass, confidenceScores] = classifyDR(featuresExtracted, svm_kernel_type, svm_regularization_C, svm_gamma); % Placeholder function
+
+% 9. Display Detection Result
+msgbox(['Predicted DR Grade: ', num2str(predictedClass)], 'Fig.13 DR Detection Grade');
+
+% 10. Display Probability Scores
+disp('Class Probability Scores:');
+disp(confidenceScores);

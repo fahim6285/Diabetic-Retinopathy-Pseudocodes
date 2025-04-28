@@ -1,0 +1,16 @@
+% Step 3: Grayscale Conversion and CLAHE Enhancement
+
+% Input: I_resized — resized RGB retinal fundus image (size: 512×512×3)
+
+% 3.1 Extract the Green Channel for Grayscale
+I_gray = I_resized(:,:,2);  % Use green channel (index 2)
+
+% 3.2 Apply CLAHE (Contrast Limited Adaptive Histogram Equalization)
+% Define CLAHE parameters
+clipLimit = 0.01;        % Clipping limit to avoid noise amplification
+tileGridSize = [8 8];    % Size of local regions for contrast adjustment
+
+% Apply CLAHE enhancement
+I_CLAHE = adapthisteq(I_gray, 'ClipLimit', clipLimit, 'NumTiles', tileGridSize);
+
+% Output: I_CLAHE — Preprocessed enhanced grayscale image

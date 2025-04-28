@@ -1,0 +1,49 @@
+% Step 1: Image Acquisition from Messidor-2, APTOS 2019, and IDRiD datasets
+
+% Define dataset paths
+messidorPath = 'path_to_Messidor2_images/';
+aptosPath = 'path_to_APTOS2019_images/';
+idridPath = 'path_to_IDRiD_images/';
+
+% Read all image filenames
+messidorFiles = dir(fullfile(messidorPath, '*.jpg')); % or *.png / *.tif if different
+aptosFiles = dir(fullfile(aptosPath, '*.png'));
+idridFiles = dir(fullfile(idridPath, '*.jpg'));
+
+% Initialize cell arrays to store images
+numMessidor = length(messidorFiles);
+numAPTOS = length(aptosFiles);
+numIDRiD = length(idridFiles);
+
+messidorImages = cell(numMessidor, 1);
+aptosImages = cell(numAPTOS, 1);
+idridImages = cell(numIDRiD, 1);
+
+% Load Messidor-2 Images
+for i = 1:numMessidor
+    imgPath = fullfile(messidorPath, messidorFiles(i).name);
+    messidorImages{i} = imread(imgPath);
+end
+
+% Load APTOS 2019 Images
+for i = 1:numAPTOS
+    imgPath = fullfile(aptosPath, aptosFiles(i).name);
+    aptosImages{i} = imread(imgPath);
+end
+
+% Load IDRiD Images
+for i = 1:numIDRiD
+    imgPath = fullfile(idridPath, idridFiles(i).name);
+    idridImages{i} = imread(imgPath);
+end
+
+% Display summary
+fprintf('Images Loaded:\n');
+fprintf('Messidor-2: %d images\n', numMessidor);
+fprintf('APTOS 2019: %d images\n', numAPTOS);
+fprintf('IDRiD: %d images\n', numIDRiD);
+
+% (Optional) Preview a sample image from each dataset
+% figure, imshow(messidorImages{1}), title('Sample Messidor-2 Image');
+% figure, imshow(aptosImages{1}), title('Sample APTOS 2019 Image');
+% figure, imshow(idridImages{1}), title('Sample IDRiD Image');

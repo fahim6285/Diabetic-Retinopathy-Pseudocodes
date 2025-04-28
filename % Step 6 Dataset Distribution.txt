@@ -1,0 +1,67 @@
+% Step 6: Dataset Distribution and Splitting
+
+% Define total images per DR grade
+total_images = [699, 437, 350, 175, 87];  % Grades 0 to 4
+
+% Define splitting ratios
+train_ratio = 0.70;
+val_ratio = 0.15;
+test_ratio = 0.15;
+
+% Initialize arrays to hold split counts
+train_counts = zeros(1,5);
+val_counts = zeros(1,5);
+test_counts = zeros(1,5);
+
+% Calculate number of images for each split
+for grade = 1:5
+    train_counts(grade) = round(train_ratio * total_images(grade));
+    val_counts(grade) = round(val_ratio * total_images(grade));
+    test_counts(grade) = total_images(grade) - train_counts(grade) - val_counts(grade);
+end
+
+% Display distribution
+disp('Distribution per Grade:');
+disp('Grade   Total   Train   Validation   Test');
+for grade = 0:4
+    fprintf('%d\t%d\t%d\t%d\t%d\n', grade, total_images(grade+1), ...
+            train_counts(grade+1), val_counts(grade+1), test_counts(grade+1));
+end
+
+% Load the full dataset
+dataset_folder = 'path_to_Messidor2_dataset';
+all_images = imageDatastore(dataset_folder, 'IncludeSubfolders', true, 'LabelSource', 'foldernames');
+
+% Split images based on grades (assuming folder names are 0,1,2,3,4)
+trainingSet = [];
+validationSet = [];
+testSet = [];
+
+for grade = 0:4
+    % Select images of this grade
+    grade_images = subset(all_images, all_images.Labels == string(grade));
+    
+    % Randomize the order
+    grade_images = shuffle(grade_images);
+    
+    % Split
+    idx_train = 1:train_counts(grade+1);
+    idx_val   = (train_counts(grade+1)+1):(train_counts(grade+1)+val_counts(grade+1));
+    idx_test  = (train_counts(grade+1)+val_counts(grade+1)+1):(train_counts(grade+1)+val_counts(grade+1)+test_counts(grade+1));
+    
+    trainingSet = [trainingSet; subset(grade_images, idx_train)];
+    validationSet = [validationSet; subset(grade_images, idx_val)];
+    testSet = [testSet; subset(grade_images, idx_test)];
+end
+
+% Final Outputs:
+% - trainingSet : 70% of dataset (1,224 images)
+% - validationSet : 15% of dataset (263 images)
+% - testSet : 15% of dataset (261 images)
+
+% Plot the dataset distribution (optional for Fig. 3 to Fig. 6)
+figure;
+categories = {'Grade 0', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4'};
+bar(0:4, total_images);
+title('Dataset Distribution');
+xlabel('DR Grade

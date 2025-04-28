@@ -1,0 +1,41 @@
+% Step 2: Preprocessing – Resize all images to 512×512 using Bilinear Interpolation
+
+% Define target size
+targetSize = [512, 512];
+
+% Initialize resized image storage
+resizedMessidorImages = cell(numMessidor, 1);
+resizedAPTOSImages = cell(numAPTOS, 1);
+resizedIDRiDImages = cell(numIDRiD, 1);
+
+% Resize Messidor-2 Images
+for i = 1:numMessidor
+    img = messidorImages{i};
+    resizedImg = imresize(img, targetSize, 'bilinear');
+    resizedMessidorImages{i} = resizedImg;
+end
+
+% Resize APTOS 2019 Images
+for i = 1:numAPTOS
+    img = aptosImages{i};
+    resizedImg = imresize(img, targetSize, 'bilinear');
+    resizedAPTOSImages{i} = resizedImg;
+end
+
+% Resize IDRiD Images
+for i = 1:numIDRiD
+    img = idridImages{i};
+    resizedImg = imresize(img, targetSize, 'bilinear');
+    resizedIDRiDImages{i} = resizedImg;
+end
+
+% Display summary
+fprintf('Images Resized to 512x512 using Bilinear Interpolation:\n');
+fprintf('Messidor-2: %d images\n', numMessidor);
+fprintf('APTOS 2019: %d images\n', numAPTOS);
+fprintf('IDRiD: %d images\n', numIDRiD);
+
+% (Optional) Preview a sample resized image
+% figure, imshow(resizedMessidorImages{1}), title('Resized Messidor-2 Image');
+% figure, imshow(resizedAPTOSImages{1}), title('Resized APTOS 2019 Image');
+% figure, imshow(resizedIDRiDImages{1}), title('Resized IDRiD Image');

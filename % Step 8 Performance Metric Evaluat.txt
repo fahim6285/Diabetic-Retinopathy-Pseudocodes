@@ -1,0 +1,100 @@
+% Step 8: Performance Metric Evaluation of DiaRetULS-Net Model
+
+% ---- Inputs (Predictions and Ground Truth Labels) ----
+% Assume 'trueLabels' and 'predictedLabels' are available
+% trueLabels: Ground Truth labels for test images
+% predictedLabels: Model's predicted labels for test images
+
+% Confusion Matrix
+confMat = confusionmat(trueLabels, predictedLabels);
+
+% Extract TP, TN, FP, FN for binary/multi-class case
+TP = diag(confMat); % True Positives are diagonal elements
+FP = sum(confMat,1)' - TP; % False Positives
+FN = sum(confMat,2) - TP;  % False Negatives
+TN = sum(confMat(:)) - (TP + FP + FN); % True Negatives
+
+% ---- Metric Computations ----
+
+% 1. Accuracy
+Accuracy = (sum(TP) + sum(TN)) / sum(confMat(:));
+fprintf('Overall Accuracy = %.2f%%\n', Accuracy * 100);
+
+% 2. Specificity
+Specificity = TN ./ (TN + FP);
+Mean_Specificity = mean(Specificity);
+fprintf('Mean Specificity = %.2f%%\n', Mean_Specificity * 100);
+
+% 3. Precision
+Precision = TP ./ (TP + FP);
+Mean_Precision = mean(Precision);
+fprintf('Mean Precision = %.2f%%\n', Mean_Precision * 100);
+
+% 4. Sensitivity (Recall)
+Sensitivity = TP ./ (TP + FN);
+Mean_Sensitivity = mean(Sensitivity);
+fprintf('Mean Sensitivity (Recall) = %.2f%%\n', Mean_Sensitivity * 100);
+
+% 5. F1-Score
+F1_Score = 2 * (Precision .* Sensitivity) ./ (Precision + Sensitivity);
+Mean_F1_Score = mean(F1_Score);
+fprintf('Mean F1-Score = %.2f%%\n', Mean_F1_Score * 100);
+
+% ---- Plot Comparative Bar Charts ----
+
+% Accuracy Comparison (Fig. 14)
+modelNames_Accuracy = {'Vertex AI', 'OptiDex', 'VGGNet', 'EfficientNetB0', ...
+                       'Hybrid (Transformer+CNN)', 'ResNet+EfficientNet+VGG', ...
+                       'Transfer Learning', 'Hybrid DL', 'Bi-LSTM', 'ResNet-50+DenseNet-121', 'Proposed DiaRetULS-Net'};
+accuracyValues = [84.48, 97.65, 97.6, 83, 95.33, 92.4, 75.4, 64.5, 96.77, 95.58, 98.83];
+
+figure;
+bar(accuracyValues);
+set(gca, 'XTickLabel', modelNames_Accuracy, 'XTickLabelRotation', 45);
+ylabel('Accuracy (%)');
+title('Fig.14 Accuracy Analysis');
+grid on;
+
+% Specificity Comparison (Fig. 15)
+modelNames_Specificity = {'VGGNet', 'ResNet+EffNet+VGG', 'Transfer Learning', 'Zongyun Gu', 'OptiDex', 'Proposed'};
+specificityValues = [98.4, 92.3, 87, 93.81, 93.45, 98.87];
+
+figure;
+bar(specificityValues);
+set(gca, 'XTickLabel', modelNames_Specificity, 'XTickLabelRotation', 45);
+ylabel('Specificity (%)');
+title('Fig.15 Specificity Analysis');
+grid on;
+
+% Precision Comparison (Fig. 16)
+modelNames_Precision = {'VGGNet', 'Bi-LSTM', 'Transfer Learning', 'Vertex AI', 'Proposed'};
+precisionValues = [98.5, 96.99, 76.8, 81.81, 99.28];
+
+figure;
+bar(precisionValues);
+set(gca, 'XTickLabel', modelNames_Precision, 'XTickLabelRotation', 45);
+ylabel('Precision (%)');
+title('Fig.16 Precision Analysis');
+grid on;
+
+% Sensitivity Comparison (Fig. 17)
+modelNames_Sensitivity = {'VGGNet', 'Bi-LSTM', 'Transfer Learning', 'Zongyun Gu', 'Vertex AI', 'Proposed'};
+sensitivityValues = [98.3, 85.43, 75.9, 73.24, 72.83, 99.21];
+
+figure;
+bar(sensitivityValues);
+set(gca, 'XTickLabel', modelNames_Sensitivity, 'XTickLabelRotation', 45);
+ylabel('Sensitivity / Recall (%)');
+title('Fig.17 Sensitivity Analysis');
+grid on;
+
+% F1-Score Comparison (Fig. 18)
+modelNames_F1 = {'VGGNet', 'Bi-LSTM', 'Proposed'};
+f1Values = [98.7, 80.27, 99.15];
+
+figure;
+bar(f1Values);
+set(gca, 'XTickLabel', modelNames_F1, 'XTickLabelRotation', 45);
+ylabel('F1-Score (%)');
+title('Fig.18 F1-Score Analysis');
+grid on;

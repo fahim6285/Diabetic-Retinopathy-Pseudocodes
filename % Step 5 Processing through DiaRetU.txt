@@ -1,0 +1,79 @@
+% Step 5: Processing through DiaRetULS-Net
+
+% Input: Feature maps (cA, cH, cV, cD, I_LBP)
+
+%% 5.1 U-Net for Segmentation
+
+% Initialize U-Net model
+unet_model = initializeUNet(); % Custom function to initialize U-Net architecture
+
+% Prepare input for U-Net (concatenated DWT + LBP features if needed)
+I_unet_input = concatenateFeatures(cA, cH, cV, cD, I_LBP); % or just use enhanced image if appropriate
+
+% Perform forward pass through U-Net
+segmentation_map = unet_model.predict(I_unet_input);
+
+% Output: S(x,y) = segmentation_map
+% S(x,y) highlights lesions, microaneurysms, hemorrhages, and exudates
+
+%% 5.2 LTCN for Temporal Feature Extraction
+
+% Initialize LTCN parameters
+tau_initial = 1.0;      % Initial Time constant
+alpha = 0.1;            % Adaptation rate
+time_steps = 10;        % Number of time steps for simulation
+num_neurons = size(segmentation_map,1) * size(segmentation_map,2);
+
+% Flatten the segmentation map to feed into LTCN
+segmentation_vector = reshape(segmentation_map, [num_neurons, 1]);
+
+% Initialize membrane potentials V_i(t)
+V = zeros(num_neurons, 1);
+
+% Initialize output feature vector
+h_T = zeros(num_neurons, 1);
+
+% Simulate over time
+for t = 1:time_steps
+    % Update time constant dynamically
+    tau_t = tau_initial + alpha * segmentation_vector;
+    
+    % Update membrane potential
+    dV = (-V + (weights * sigmoid(V))) ./ tau_t;
+    
+    % Integrate over time (Euler method)
+    V = V + dV;
+end
+
+% Final temporal feature vector by integrating V over time
+h_T = integrateAndActivate(V, time_steps);
+
+% Output: h_T = final LTCN feature vector
+
+%% 5.3 Adam Optimizer (Feature Optimization)
+
+% Adam optimizer settings
+learning_rate = 0.001;
+beta1 = 0.9;
+beta2 = 0.999;
+epsilon = 1e-8;
+
+% Initialize moment estimates
+m = zeros(size(h_T));
+v = zeros(size(h_T));
+timestep = 0;
+
+% Perform one or more optimization steps (optional if needed)
+
+%% 5.4 Multi-Class SVM Classification
+
+% Define number of classes (example: k = 5 for DR grades 0–4)
+k = 5;
+
+% Train One-vs-One (OvO) binary SVM classifiers
+svm_model = fitcecoc(h_T', labels, 'Coding', 'onevsone', 'Learners', templateSVM('KernelFunction', 'linear'));
+
+% Predict using trained SVM model
+predicted_class = predict(svm_model, h_T');
+
+% Output: C_pred = predicted diabetic retinopathy stage
